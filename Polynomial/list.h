@@ -39,6 +39,7 @@ inline void expression::add(int exp, int c)
 		head = temp;
 		tail = head;
 		head->next = tail;
+		tail->next = NULL;
 	}
 	else {
 		tail->next = temp;
@@ -155,27 +156,44 @@ inline void expression::printList()
 inline expression expression::operator+(const expression & ex)
 {
 	expression sum;
-	node* temp1 = expression::head;
-	node* temp2 = ex.head;
+	node* expression1 = expression::head;
+	node* expression2 = ex.head;
+	node* previousNodeEx1 = expression1;
 
-	while (temp2 != NULL) {
-		while (temp2->exp < temp1->exp && temp1 != NULL) {
-			temp1 = temp1->next;
+	if (expression1 == NULL) {
+		sum.head = expression2;
+		return sum;
+	}
+
+	while (expression2 != NULL) {
+		while (expression1 != NULL && expression2->exp < expression1->exp) {
+			previousNodeEx1 = expression1;
+			expression1 = expression1->next;
 		}
-		if (temp1 == NULL) {
-			sum.add(temp2->exp, temp2->c);
-			temp2 = temp2->next;
+		if (expression1 == expression::head) {
+			node *temp = new node();
+			temp->c = expression2->c;
+			temp->exp = expression2->exp;
+			temp->next = expression1;
+			head = expression1 = temp;
+			expression2 = expression2->next;
 			continue;
 		}
-		if (temp2->exp == temp1->exp) {
-			temp1->c += temp2->c;
-			temp2 = temp2->next;
+		if (expression1 == NULL) {
+			add(expression2->exp, expression2->c);
+			expression2 = expression2->next;
 			continue;
 		}
-		node *temp3 = temp2;
-		temp3->next = temp1->next;
-		temp1->next = temp3;
-		temp2 = temp2->next;
+		if (expression2->exp == expression1->exp) {
+			expression1->c += expression2->c;
+			expression2 = expression2->next;
+			continue;
+		}
+		node *temp = expression2;
+		temp->next = previousNodeEx1->next;
+		previousNodeEx1->next = temp;
+		expression2 = expression2->next;
+		
 	}
 	sum.head = head;
 	return sum;
